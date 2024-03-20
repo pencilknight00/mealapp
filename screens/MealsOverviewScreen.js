@@ -1,8 +1,52 @@
-import { View, Text, FlatList, StyleSheet, Pressable, ImageBackground } from "react-native";
+import { View, Text, FlatList, StyleSheet, Pressable, ImageBackground, Platform} from "react-native"; //this
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MEALS } from '../data/dummy-data';
 import { CATEGORIES } from '../data/dummy-data';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import FontAwesome from '@expo/vector-icons/FontAwesome'
+import { useState, useEffect } from "react";
+
+
 const MealsOverviewScreen = ({ route, navigation }) => {
+    const [favorites, setFavorites] = useState([]);
+
+    useEffect(() => {
+        // Load favorites from AsyncStorage on component mount
+        loadFavorites();
+    }, []);
+
+    const loadFavorites = async () => {
+        try {
+            const favoritesString = await AsyncStorage.getItem('favorites');
+            if (favoritesString) {
+                setFavorites(JSON.parse(favoritesString));
+            }
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+        }
+    };
+
+    const toggleFavorite = async mealId => {
+        const index = favorites.findIndex(item => item === mealId);
+        if (index === -1) {
+            const updatedFavorites = [...favorites, mealId];
+            setFavorites(updatedFavorites);
+            await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+            console.log(favorites + "+ 1")
+        } else {
+            const updatedFavorites = favorites.filter(item => item !== mealId);
+            setFavorites(updatedFavorites);
+            await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+            console.log(favorites + "- 1")
+        }
+
+    };
+
+    // Function to check if a meal is favorite
+    const isFavorite = mealId => {
+        return favorites.includes(mealId);
+    };
+    
     const categoryId = route.params.category;
         function filterMealsByCategoryId(categoryId) {
             return MEALS.filter(meal => meal.categoryIds.includes(categoryId));
@@ -13,14 +57,20 @@ const MealsOverviewScreen = ({ route, navigation }) => {
             const category = CATEGORIES.find(cat => cat.id === categoryId);
             return category ? category.title : 'Uncategorized';
         }
+
+        
     return (
         <View style={styles.container}>
             <FlatList data={mealsFiltered}
             numColumn='1'
             keyExtractor={(item, index) => index.toString()}
             renderItem={ ({ item }) => (
+                <View style={styles.shadow}> 
                  <Pressable onPress={() => {navigation.navigate('MealDetailScreen', {meal: item})}}>
                     <ImageBackground source={{uri: item.imageUrl}} style={styles.mealContainer}>
+                        <Pressable onPress={() => toggleFavorite(item.id)} style={styles.favoriteIcon}>
+                            <FontAwesome name={isFavorite(item.id) ? 'heart' : 'heart-o'} size={20} color="pink" />
+                        </Pressable>
                         <View style={styles.categoryContainer}>
                             <Text style={styles.MealTitle}>{item.title}</Text>
                             <View style={styles.categories}>
@@ -40,9 +90,11 @@ const MealsOverviewScreen = ({ route, navigation }) => {
                                 <FontAwesome6 style={styles.detailIcon} name="chart-simple" size={15}></FontAwesome6>
                                 <Text style={styles.detailText}>{item.complexity}</Text>
                             </View>
+                            
                         </View>
                     </ImageBackground>
                 </Pressable>
+                </View>
              )}>
 
             </FlatList>
@@ -54,9 +106,20 @@ const styles = StyleSheet.create({
     container:{
         flex: 1,
         backgroundColor: 'white',
-        
+        paddingTop: (Platform.OS === 'ios') ? 35 : 25,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    shadow: {
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 9,
+        zIndex:999,
     },
     mealContainer: {  
         margin: 17,
@@ -68,8 +131,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.27,
         shadowRadius: 4.65,
         elevation: 9,
+        zIndex:999,
+        
         backgroundColor: 'white',
         overflow: 'hidden',
+
       justifyContent: 'flex-end',
       borderRadius: 4,
       resizeMode: 'stretch',
@@ -77,16 +143,26 @@ const styles = StyleSheet.create({
       height: 240,
       
     },
+    favoriteIcon:{
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        position: 'absolute',
+        right: 10,
+        top: 10,
+        backgroundColor: 'white'
+    },
     MealTitle: {
         color: 'black',
-        fontWeight: 'bold',
+        fontWeight: '800',
         fontSize: 23,
     },
     categoryContainer:{
         // marginHorizontal: 10,
         
-        maxHeight: 130,
-        
+        maxHeight: 170,
         borderBottomLeftRadius: 4,
         borderBottomRightRadius: 4,
         backgroundColor: 'white',
