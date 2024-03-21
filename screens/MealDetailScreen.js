@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
-import { View, Text, Image, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Platform, useWindowDimensions} from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
     //     meal: {
@@ -21,7 +21,8 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
     const screenDimensions = Dimensions.get('screen');
 
 const MealDetailScreen = ( { route }) => {
-
+     const windowWidth = useWindowDimensions().width;
+    const windowHeight = useWindowDimensions().height;
     const [dimmensions, setDimensions] = useState({
         screen: screenDimensions
       });
@@ -39,14 +40,17 @@ const MealDetailScreen = ( { route }) => {
 
 
       return (
-        <View style={styles.container}>
-        <ScrollView>
-        
-           <View style={styles.imageContentContainer}>
-                <Image source={{ uri: meal.imageUrl }} style={styles.pic}></Image>
-                <View style={styles.content}>
+        <View style={[styles.container, {paddingTop: (Platform.OS === 'ios') ? (windowWidth < 500 ? 35 : 0) : 25,}]}>
+        <ScrollView
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        >
+           <View style={[styles.imageContentContainer, {minHeight: windowHeight / 2.2,}]}>
+            <View style={{minHeight: 400}}><Image source={{ uri: meal.imageUrl }} style={[styles.pic, {width: windowWidth < 500 ? windowWidth : 600,height: windowWidth < 500 ? null : 300}]}></Image></View>
+                
+                <View style={[styles.content, { width: 300, top:  windowWidth < 500 ? 210 : 200}]}>
                 <Text style={styles.title}>{meal.title}</Text>
-                        <View style={styles.boolean}>
+                        <View style={[styles.boolean, {width: windowWidth / 1.5,}]}>
                             <View style={styles.booleanContainer}>
                                 <Text><Text style={{fontWeight: 'bold'}}>Glutenfree:</Text> {meal.isGlutenFree ? "yes" : "no"}</Text>
                                 <Text><Text style={{fontWeight: 'bold'}}>Vegan:</Text> {meal.isVegan ? "yes" : "no"}</Text>
@@ -55,11 +59,17 @@ const MealDetailScreen = ( { route }) => {
                                 <Text><Text style={{fontWeight: 'bold'}}>Vegetarian:</Text> {meal.isVegetarian ? "yes" : "no"}</Text>
                                 <Text><Text style={{fontWeight: 'bold'}}>LactoseFree:</Text> {meal.isLactoseFree ? "yes" : "no"}</Text>
                             </View>
+                            
                         </View>
                 </View>
                 
             </View>
-                <View style={styles.ingredientsContainer}>
+                <View style={[styles.detailsContainer, {width: windowWidth * 0.9,}]}>
+                <Text style={styles.sectionTitle}>Duration: </Text>   
+                    
+                    <Text style={styles.detailText}>{meal.duration}min</Text>    
+                </View>
+                <View style={[styles.ingredientsContainer, {width: windowWidth * 0.9,}]}>
                     <Text style={styles.sectionTitle}>Ingredients</Text>
                         
                         {meal.ingredients.map((step, index) => (
@@ -69,7 +79,7 @@ const MealDetailScreen = ( { route }) => {
                             </View>
                 ))}
                 </View>
-                <View style={[styles.stepsContainer]}>
+                <View style={[styles.stepsContainer,{width: windowWidth * 0.9,}]}>
                     <Text style={styles.sectionTitle}>Steps</Text>
                     {meal.steps.map((step, index) => (
 
@@ -84,20 +94,18 @@ const MealDetailScreen = ( { route }) => {
 const styles = StyleSheet.create({
     container: {
         paddingTop: (Platform.OS === 'ios') ? 35 : 25,
-
         // alignItems: 'center',
         backgroundColor: 'white',
         flex: 1
     },
     content: {
         backgroundColor: 'white',
-        width: '80%',
-        height: screenDimensions.height / 5,
+        
         padding: 10,
         alignSelf: 'center',
         borderRadius: 30,
         position: 'absolute',
-        top: 200,
+        
 
         shadowColor: "#000",
         shadowOffset: {
@@ -111,8 +119,8 @@ const styles = StyleSheet.create({
 
     },
     imageContentContainer:{
-        alignItems: 'flex-end',
-        minHeight: screenDimensions.height / 2.2,
+        alignItems: 'center',
+        
     },
     boolean:{
         margin: 17,
@@ -121,7 +129,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 10,
         
-        width: screenDimensions.width / 1.5,
+        
         alignSelf: 'center',
         borderRadius: 10,
         
@@ -148,8 +156,8 @@ const styles = StyleSheet.create({
     },
     pic:{
         
-        resizeMode: 'cover',
-        width: '100%',
+        resizeMode: 'stretch',
+        alignSelf: 'center',
         aspectRatio: 1.4,
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
@@ -173,7 +181,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
         borderWidth: 1,
-        width: screenDimensions.width * 0.9,
+        
         alignSelf: 'center'
     },
     stepsContainer:{
@@ -181,9 +189,21 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
         borderWidth: 1,
-        width: screenDimensions.width * 0.9,
+        
         alignSelf: 'center'
     },
+    detailsContainer: {
+        flexDirection: 'row',
+        marginTop: 20,
+        padding: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        alignSelf: 'center',
+        alignItems: 'center'
+    },
+    detailText:{
+        fontSize: 30
+    }
 });
 
 export default MealDetailScreen;

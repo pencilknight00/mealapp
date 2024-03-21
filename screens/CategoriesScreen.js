@@ -1,10 +1,13 @@
-import { View, Text, StyleSheet, Button, FlatList, Pressable, Platform } from "react-native";
+import { View, Text, StyleSheet, Button, FlatList, Pressable, Platform, useWindowDimensions } from "react-native";
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CATEGORIES } from '../data/dummy-data';
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 
 const CategoriesScreen = ({ navigation }) => {
+    const windowWidth = useWindowDimensions().width;
+    const windowHeight = useWindowDimensions().height;
     const [favorites, setFavorites] = useState([]);
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -14,7 +17,8 @@ const CategoriesScreen = ({ navigation }) => {
                     const favoritesData = JSON.parse(favoritesString);
                     setFavorites(favoritesData);
                 }
-                console.log(favorites)
+                console.log(windowWidth)
+                console.log(windowHeight)
             } catch (error) {
                 console.error('Error fetching favorites:', error);
             }
@@ -23,21 +27,23 @@ const CategoriesScreen = ({ navigation }) => {
         fetchFavorites();
     }, []);
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {paddingTop: (Platform.OS === 'ios') ? (windowWidth < 500 ? 35 : 0) : 20,}]} >
             
             <View style={styles.flatlistContainer}>
             <FlatList data={CATEGORIES}
             numColumns='2'
             keyExtractor={(item, index) => index.toString()}
-            renderItem={ ({ item }) => (<Pressable onPress={() => {navigation.navigate('MealsOverviewScreen', {category: item.id})}} style={[styles.categoriesContainer, {backgroundColor: item.color}]}>
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            renderItem={ ({ item }) => (<Pressable onPress={() => {navigation.navigate('MealsOverviewScreen', {category: item.id})}} style={[styles.categoriesContainer, {backgroundColor: item.color, width: windowWidth < 500 ? '45%' : '47.5%',}]}>
                 <Text style={styles.categoryTitle}>{item.title}</Text>
             </Pressable>)}>
                 
             </FlatList>
             </View>
             <Pressable style={styles.favourites} onPress={() => {navigation.navigate('FavouriteScreen', { favorites: favorites });
-                console.log(favorites)}}>
-            
+                }}>
+                   <FontAwesome name={'heart'} size={30} color="pink" /> 
             </Pressable>
         </View>
     );
@@ -53,10 +59,8 @@ const styles = StyleSheet.create({
         
     },
     flatlistContainer:{
-       height: '100%'
     },
     categoriesContainer:{  
-      width: '45%',
       height: 160,
       margin: 10,
       alignItems: 'flex-end',
@@ -84,14 +88,17 @@ const styles = StyleSheet.create({
         height: 89,
     },
     favourites:{
+       
         height: 60,
-        margin: 10,
-        borderRadius: 20,
+        margin: 20,
+        borderRadius: 10,
         width: 60,
-        backgroundColor: 'black',
+        backgroundColor: 'white',
         position: 'absolute',
         top: (Platform.OS === 'ios') ? 35 : 20,
-        right: 0
+        right: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
   });
 

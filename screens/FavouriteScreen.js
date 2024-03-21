@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable, ImageBackground, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable, ImageBackground, Platform, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MEALS } from '../data/dummy-data';
 import { CATEGORIES } from '../data/dummy-data';
@@ -8,11 +8,22 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const FavouriteScreen = ({ navigation }) => {
     const [favorites, setFavorites] = useState();
+    const windowWidth = useWindowDimensions().width;
+    const windowHeight = useWindowDimensions().height;
+    const [columnsCount, setColumnsCount] = useState('1')
 
     useEffect(() => {
         // Load favorites from AsyncStorage on component mount
         loadFavorites();
     }, []);
+
+    useEffect(() => {
+        if(windowWidth < 500){
+            setColumnsCount('1');
+        } else {
+            setColumnsCount('2');
+        }
+    }, [windowHeight]);
 
     const loadFavorites = async () => {
         try {
@@ -66,13 +77,17 @@ const FavouriteScreen = ({ navigation }) => {
     //     }
     // };
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {paddingTop: (Platform.OS === 'ios') ? (windowWidth < 500 ? 35 : 0) : 20,}]}>
             <Text style={styles.fav}>Your Favorites</Text>
             <FlatList
                 data={favorites}
-                numColumns={1}
-                keyExtractor={item => item.toString()}
+                key={columnsCount}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                numColumns={columnsCount}
+                keyExtractor={item => `${columnsCount}${item}`}
                 renderItem={({ item }) => {  
+                    
                     const meal = findMealById(item);
                     return (
                         <View style={styles.shadow}>

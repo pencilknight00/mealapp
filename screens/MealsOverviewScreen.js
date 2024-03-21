@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, Pressable, ImageBackground, Platform} from "react-native"; //this
+import { View, Text, FlatList, StyleSheet, Pressable, ImageBackground, Platform, useWindowDimensions} from "react-native"; //this
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MEALS } from '../data/dummy-data';
 import { CATEGORIES } from '../data/dummy-data';
@@ -9,11 +9,23 @@ import { useState, useEffect } from "react";
 
 const MealsOverviewScreen = ({ route, navigation }) => {
     const [favorites, setFavorites] = useState([]);
-
+    const windowWidth = useWindowDimensions().width;
+    const windowHeight = useWindowDimensions().height;
+    const [columnsCount, setColumnsCount] = useState('1')
+    
     useEffect(() => {
-        // Load favorites from AsyncStorage on component mount
+        
         loadFavorites();
     }, []);
+
+    useEffect(() => {
+        if(windowWidth < 500){
+            setColumnsCount('1');
+        } else {
+            setColumnsCount('2');
+        }
+        
+    }, [windowHeight]);
 
     const loadFavorites = async () => {
         try {
@@ -60,11 +72,14 @@ const MealsOverviewScreen = ({ route, navigation }) => {
 
         
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {paddingTop: (Platform.OS === 'ios') ? (windowWidth < 500 ? 35 : 0) : 25,}]}>
             <FlatList data={mealsFiltered}
-            numColumn='1'
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={ ({ item }) => (
+            key={columnsCount}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            numColumns={columnsCount}
+            keyExtractor={item => `${columnsCount}${item.id}`}
+            renderItem={({ item }) => (
                 <View style={styles.shadow}> 
                  <Pressable onPress={() => {navigation.navigate('MealDetailScreen', {meal: item})}}>
                     <ImageBackground source={{uri: item.imageUrl}} style={styles.mealContainer}>
