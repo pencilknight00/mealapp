@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+
 import { ScrollView } from 'react-native';
 import { View, Text, Image, StyleSheet, Dimensions, Platform, useWindowDimensions} from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
@@ -18,26 +18,11 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
     //     isVegetarian,
     //     isLactoseFree
     //     }
-    const screenDimensions = Dimensions.get('screen');
 
 const MealDetailScreen = ( { route }) => {
-     const windowWidth = useWindowDimensions().width;
+    const windowWidth = useWindowDimensions().width;
     const windowHeight = useWindowDimensions().height;
-    const [dimmensions, setDimensions] = useState({
-        screen: screenDimensions
-      });
     const { meal } = route.params;
-
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener(
-          'change', 
-          ({window, screen}) => {
-            setDimensions({window, screen});
-          })
-    
-          return () => subscription?.remove;
-      })
-
 
       return (
         <View style={[styles.container, {paddingTop: (Platform.OS === 'ios') ? (windowWidth < 500 ? 35 : 0) : 25,}]}>
@@ -46,7 +31,8 @@ const MealDetailScreen = ( { route }) => {
         showsHorizontalScrollIndicator={false}
         >
            <View style={[styles.imageContentContainer, {minHeight: windowHeight / 2.2,}]}>
-            <View style={{minHeight: 400}}><Image source={{ uri: meal.imageUrl }} style={[styles.pic, {width: windowWidth < 500 ? windowWidth : 600,height: windowWidth < 500 ? null : 300}]}></Image></View>
+            <View style={{minHeight: 400}}><Image source={{ uri: meal.imageUrl }}
+             style={[styles.pic, {width: windowWidth < 500 ? windowWidth : 600,height: windowWidth < 500 ? null : 300}]}></Image></View>
                 
                 <View style={[styles.content, { width: 300, top:  windowWidth < 500 ? 210 : 200}]}>
                 <Text style={styles.title}>{meal.title}</Text>

@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Platform } from 'react-native';
-import React, { useState }  from 'react';
+import React  from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -16,12 +16,10 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  const [favorites, setFavorites] = useState([]);
 
   return (
     <NavigationContainer >
       <StatusBar></StatusBar>
-      
          <Stack.Navigator initialRouteName='CategoriesScreen' screenOptions={{headerShown: false}}>
           <Stack.Screen name='MealsOverviewScreen' component={MealsOverviewScreen}/>
           <Stack.Screen name='MealDetailScreen' component={MealDetailScreen}/>

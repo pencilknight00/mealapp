@@ -7,7 +7,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 const CategoriesScreen = ({ navigation }) => {
     const windowWidth = useWindowDimensions().width;
-    const windowHeight = useWindowDimensions().height;
     const [favorites, setFavorites] = useState([]);
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -17,8 +16,7 @@ const CategoriesScreen = ({ navigation }) => {
                     const favoritesData = JSON.parse(favoritesString);
                     setFavorites(favoritesData);
                 }
-                console.log(windowWidth)
-                console.log(windowHeight)
+                
             } catch (error) {
                 console.error('Error fetching favorites:', error);
             }
@@ -30,17 +28,18 @@ const CategoriesScreen = ({ navigation }) => {
         <View style={[styles.container, {paddingTop: (Platform.OS === 'ios') ? (windowWidth < 500 ? 35 : 0) : 20,}]} >
             
             <View style={styles.flatlistContainer}>
-            <FlatList data={CATEGORIES}
-            numColumns='2'
-            keyExtractor={(item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            renderItem={ ({ item }) => (<Pressable onPress={() => {navigation.navigate('MealsOverviewScreen', {category: item.id})}} style={[styles.categoriesContainer, {backgroundColor: item.color, width: windowWidth < 500 ? '45%' : '47.5%',}]}>
-                <Text style={styles.categoryTitle}>{item.title}</Text>
-            </Pressable>)}>
-                
-            </FlatList>
+                <FlatList data={CATEGORIES}
+                numColumns='2'
+                keyExtractor={(item, index) => index.toString()}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                renderItem={ ({ item }) => (<Pressable onPress={() => {navigation.navigate('MealsOverviewScreen', {category: item.id})}} 
+                style={[styles.categoriesContainer, {backgroundColor: item.color, width: windowWidth < 500 ? '45%' : '47.5%',}]}>
+                    <Text style={styles.categoryTitle}>{item.title}</Text>
+                </Pressable>)}>
+                </FlatList>
             </View>
+
             <Pressable style={styles.favourites} onPress={() => {navigation.navigate('FavouriteScreen', { favorites: favorites });
                 }}>
                    <FontAwesome name={'heart'} size={30} color="pink" /> 

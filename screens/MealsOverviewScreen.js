@@ -14,7 +14,6 @@ const MealsOverviewScreen = ({ route, navigation }) => {
     const [columnsCount, setColumnsCount] = useState('1')
     
     useEffect(() => {
-        
         loadFavorites();
     }, []);
 
@@ -91,7 +90,6 @@ const MealsOverviewScreen = ({ route, navigation }) => {
                             <View style={styles.categories}>
                                 <FontAwesome6 name="list-ul" size={15}></FontAwesome6>
                                 {item.categoryIds.map(categoryId => (
-                                    
                                     <Text key={categoryId} style={styles.categoryTitle}>
                                     {findCategoryTitle(categoryId)}
                                     </Text>
@@ -105,7 +103,6 @@ const MealsOverviewScreen = ({ route, navigation }) => {
                                 <FontAwesome6 style={styles.detailIcon} name="chart-simple" size={15}></FontAwesome6>
                                 <Text style={styles.detailText}>{item.complexity}</Text>
                             </View>
-                            
                         </View>
                     </ImageBackground>
                 </Pressable>
